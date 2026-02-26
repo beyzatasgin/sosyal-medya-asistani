@@ -1,4 +1,4 @@
-# 📧 E-Posta Tabanlı Sosyal Medya Yönetim Asistanı
+#  E-Posta Tabanlı Sosyal Medya Yönetim Asistanı
 
 > n8n + OpenAI GPT-4o + Gmail + Telegram entegrasyonu ile otomatik sosyal medya içerik üretimi ve yayınlama sistemi.
 
@@ -144,15 +144,14 @@ Konu: instagram post yaz
 ## Dosya Yapısı
 
 ```
-📦 sosyal-medya-asistani
+sosyal-medya-asistani
  ┣ 📄 README.md
  ┣ 📄 workflow.json          # n8n workflow dosyası
  ┣ 📄 SosyalMedyaAsistani_Rapor.pdf  # Proje raporu
  ┗ 📁 screenshots/           # Ekran görüntüleri
-    ┣ 🖼️ workflow_genel.png
-    ┣ 🖼️ switch_node.png
-    ┣ 🖼️ openai_node.png
-    ┗ 🖼️ telegram_output.png
+    ┣  workflow_genel.png
+    ┣  gmail.png
+    ┗  telegram_output.png
 ```
 
 ---
