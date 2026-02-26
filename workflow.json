@@ -1,0 +1,682 @@
+{
+  "name": "E-posta Tabanlı Sosyal Medya İçerik Yönetim Asistanı",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "filters": {}
+      },
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -448,
+        48
+      ],
+      "id": "e56ff962-b500-4e8f-8767-6be39e31c214",
+      "name": "Gmail Trigger",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "gFPCG5ntemdOxgAI",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "872ff113-3ff6-4d2b-aa9a-42595be30d35",
+                    "leftValue": "={{ $json.Subject }}",
+                    "rightValue": "twitter",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "dcf54c9f-26d3-45a8-8eea-9e65bab87c05",
+                    "leftValue": "={{ $json.Subject }}",
+                    "rightValue": "linkedin",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "459fc183-fdc1-4a7b-b930-5b923187cdb1",
+                    "leftValue": "={{ $json.Subject }}",
+                    "rightValue": "instagram",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -224,
+        32
+      ],
+      "id": "eee88fe5-df5b-4be2-9fc5-fb30583896cc",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "jsCode": "const body = $input.all()[0].json.body?.text || \n             $input.all()[0].json.snippet || \"\";\nconst subject = $input.all()[0].json.Subject || \"\";\n\n// Saat ayrıştır\nconst timeMatch = body.match(/saat\\s(\\d{2}:\\d{2})/i);\nconst scheduledTime = timeMatch ? timeMatch[1] : null;\n\n// Yarın mı bugün mü?\nconst isTomorrow = body.toLowerCase().includes(\"yarın\");\nconst date = new Date();\nif (isTomorrow) date.setDate(date.getDate() + 1);\n\nlet isoTime = null;\nif (scheduledTime) {\n  const [hour, minute] = scheduledTime.split(\":\");\n  date.setHours(parseInt(hour), parseInt(minute), 0, 0);\n  isoTime = date.toISOString();\n}\n\n// Platform belirle\nlet platform = \"genel\";\nif (subject.toLowerCase().includes(\"instagram\")) platform = \"instagram\";\nelse if (subject.toLowerCase().includes(\"twitter\")) platform = \"twitter\";\nelse if (subject.toLowerCase().includes(\"linkedin\")) platform = \"linkedin\";\n\nconst immediate = body.toLowerCase().includes(\"hemen\") || !isoTime;\n\nreturn [{\n  json: {\n    platform,\n    userRequest: body,\n    scheduledTime: isoTime,\n    immediate,\n    rowId: Date.now().toString()\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        0,
+        48
+      ],
+      "id": "b27bd848-6b52-4cb5-a148-db51202c2440",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "b59a67f0-05e9-4436-9491-829e55508aa4",
+              "leftValue": "={{ $json.immediate }}",
+              "rightValue": "true",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        784,
+        32
+      ],
+      "id": "4d43dba7-6a1a-4dd9-9c8b-98ca63c45fe0",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1K4z_lFGVjg8C6WPpUp3wyjY579FjqS4py_fSnP5KmtE",
+          "mode": "list",
+          "cachedResultName": "Content_Plan_Sheet",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1K4z_lFGVjg8C6WPpUp3wyjY579FjqS4py_fSnP5KmtE/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 772856081,
+          "mode": "list",
+          "cachedResultName": "Content Plan",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1K4z_lFGVjg8C6WPpUp3wyjY579FjqS4py_fSnP5KmtE/edit#gid=772856081"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "ID": "={{ $json.rowId }}",
+            "Tarih": "={{ $now }}",
+            "Platform": "={{ $json.platform }}",
+            "İçerik": "={{ $json.generatedContent }}",
+            "Durum": "Taslak"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "ID",
+              "displayName": "ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Tarih",
+              "displayName": "Tarih",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Platform",
+              "displayName": "Platform",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "İçerik",
+              "displayName": "İçerik",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Durum",
+              "displayName": "Durum",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Yayın Saati",
+              "displayName": "Yayın Saati",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        624,
+        48
+      ],
+      "id": "1c2382ca-ea07-41ca-8bea-7c4b8eb825b1",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "iRwNlJVW3mklXEBi",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resume": "specificTime",
+        "dateTime": "={{ new Date($json.Tarih).toISOString() }}"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        944,
+        96
+      ],
+      "id": "8bf02396-fbeb-4b50-b84e-1b01c6510856",
+      "name": "Wait",
+      "webhookId": "c9b6dc5e-258d-453f-a3cd-938679e46fc7"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "GPT-4O"
+        },
+        "responses": {
+          "values": [
+            {
+              "role": "system",
+              "content": "Sen bir sosyal medya uzmanısın. \nKullanıcının isteğine göre Telegram kanalı için \netkileyici, ilgi çekici bir içerik üret.\nMaksimum 500 karakter, emoji kullan, \n2-3 hashtag ekle. Sadece gönderi metnini yaz."
+            },
+            {
+              "content": "={{ $('Code in JavaScript').item.json.userRequest }}"
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.1,
+      "position": [
+        160,
+        48
+      ],
+      "id": "260dcd50-2732-442a-81f1-2254a7261df8",
+      "name": "Message a model",
+      "credentials": {
+        "openAiApi": {
+          "id": "heMy1A49aEK5KIqc",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "eb3321fc-2c2d-47cb-8d3b-48d3c0418fb9",
+              "name": "generatedContent",
+              "value": "={{$json.output[0].content[0].text}}",
+              "type": "string"
+            },
+            {
+              "id": "911bb3e6-cc1f-45a4-957a-a0c1ffa45eed",
+              "name": "platform",
+              "value": "={{ $('Code in JavaScript').item.json.platform }}",
+              "type": "string"
+            },
+            {
+              "id": "80ca6d1e-1301-473a-b55c-5f86798a8488",
+              "name": "=immediate",
+              "value": "={{ $('Code in JavaScript').item.json.immediate }}",
+              "type": "string"
+            },
+            {
+              "id": "57a1e5d9-0ae7-4415-9d9d-04174e1bceab",
+              "name": "=scheduledTime",
+              "value": "={{ $('Code in JavaScript').item.json.scheduledTime }}",
+              "type": "string"
+            },
+            {
+              "id": "a262d35e-a439-4090-8fdf-078da0c54025",
+              "name": "=rowId",
+              "value": "={{ $('Code in JavaScript').item.json.rowId }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        464,
+        48
+      ],
+      "id": "0fdf79ea-519f-4f93-938d-b5dd471d525e",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Gmail Trigger').item.json.From }}\n",
+        "subject": "✅ İçeriğin Yayınlandı!",
+        "message": "=Merhaba!  İçeriğin başarıyla Telegram kanalına gönderildi. 🎉  Platform: {{ $('Edit Fields1').item.json.platform }} İçerik: {{ $('Edit Fields1').item.json.generatedContent }} Yayın Saati: {{ $now }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1520,
+        16
+      ],
+      "id": "a36effef-5bac-417e-abab-4012760ee015",
+      "name": "Send a message",
+      "webhookId": "d3cc3fac-75b8-438a-b781-296819c5eae6",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "gFPCG5ntemdOxgAI",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1K4z_lFGVjg8C6WPpUp3wyjY579FjqS4py_fSnP5KmtE",
+          "mode": "list",
+          "cachedResultName": "Content_Plan_Sheet",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1K4z_lFGVjg8C6WPpUp3wyjY579FjqS4py_fSnP5KmtE/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 772856081,
+          "mode": "list",
+          "cachedResultName": "Content Plan",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1K4z_lFGVjg8C6WPpUp3wyjY579FjqS4py_fSnP5KmtE/edit#gid=772856081"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "ID": "={{ $json.rowId }}",
+            "Tarih": "={{ $now }}",
+            "Platform": "={{ $json.platform }}",
+            "İçerik": "={{ $json.generatedContent }}",
+            "Durum": "Taslak"
+          },
+          "matchingColumns": [
+            "ID"
+          ],
+          "schema": [
+            {
+              "id": "ID",
+              "displayName": "ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Tarih",
+              "displayName": "Tarih",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Platform",
+              "displayName": "Platform",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "İçerik",
+              "displayName": "İçerik",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Durum",
+              "displayName": "Durum",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Yayın Saati",
+              "displayName": "Yayın Saati",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1344,
+        16
+      ],
+      "id": "384b3100-88f4-41f0-b855-8cf83b868a8e",
+      "name": "Update row in sheet",
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "iRwNlJVW3mklXEBi",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "-1003203187629",
+        "text": "={{$json[\"İçerik\"]}}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1152,
+        16
+      ],
+      "id": "9893195d-46c2-40e9-95a9-cd4519621471",
+      "name": "Send a text message",
+      "webhookId": "f2322aa0-f347-47ab-b111-15bbe1f289e6",
+      "credentials": {
+        "telegramApi": {
+          "id": "WKqmaFJQ0vkzZxBr",
+          "name": "Telegram account 2"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Gmail Trigger": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message": {
+      "main": [
+        []
+      ]
+    },
+    "Update row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a text message": {
+      "main": [
+        [
+          {
+            "node": "Update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "83ef1bd8-05d6-415d-9838-3d76ea50c2f8",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "fcf9327de65fe239e90973280d2965c7e5e42b994c4db6c43e6ad0e34ccf6b91"
+  },
+  "id": "DYYCiCJ26NuXfh4H",
+  "tags": []
+}
