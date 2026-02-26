@@ -1,6 +1,7 @@
 #  E-Posta Tabanlı Sosyal Medya Yönetim Asistanı
 
 > n8n + OpenAI GPT-4o + Gmail + Telegram entegrasyonu ile otomatik sosyal medya içerik üretimi ve yayınlama sistemi.
+<img width="1753" height="276" alt="workflow_genel" src="https://github.com/user-attachments/assets/fe909f6c-45f8-48eb-bd3c-b0da1b3227b7" />
 
 ---
 
@@ -14,6 +15,9 @@ Bu proje, Gmail üzerinden gelen e-posta komutlarını yapay zeka ile işleyerek
 Konu: instagram post yaz
 İçerik: Yapay zeka hakkında motivasyonel bir post yaz, yarın saat 18:00'de paylaş
 ```
+<img width="432" height="172" alt="gmail" src="https://github.com/user-attachments/assets/9c6a1cc3-a8de-4369-87d3-0b41685bcf99" />
+
+<img width="1489" height="265" alt="gmail-2" src="https://github.com/user-attachments/assets/8ed52b61-ed5d-49e4-acb3-a41dc3fba83a" />
 
 → Sistem içerik üretir → Sheets'e kaydeder → 18:00'de Telegram'a yayınlar → Sana onay maili gelir ✅
 
@@ -64,14 +68,15 @@ IF (hemen mi, planlı mı?)
 - Google Sheets dosyası
 
 ### 2. Google Sheets Hazırlığı
-
 Yeni bir Google Sheets dosyası oluştur ve ilk satıra şu başlıkları ekle:
 
 ```
 ID | Tarih | Platform | İçerik | Durum | Yayın Saati
 ```
+<img width="800" height="200" alt="sheet" src="https://github.com/user-attachments/assets/8240ad33-9d54-4c16-8cf2-76cb7ce006ef" />
 
 ### 3. Telegram Bot Kurulumu
+<img width="1000" height="400" alt="telegram" src="https://github.com/user-attachments/assets/40c8c55c-7612-4224-bed9-264ea7e1a99f" />
 
 1. Telegram'da `@BotFather`'a git
 2. `/newbot` komutunu gönder
